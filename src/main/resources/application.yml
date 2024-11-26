@@ -1,0 +1,22 @@
+server:
+  port: 8888 #dont change
+
+spring:
+  application:
+     name: TrimbleCars
+  h2:
+     console:
+       enabled: true
+  datasource:
+    driver-class-name: org.hsqldb.jdbc.JDBCDriver
+    username: user
+    password: 12qwaszx
+    url: jdbc:hsqldb:file:TrimbleCarsDB;shutdown=true
+  jpa:
+    properties:
+      hibernate:
+        hbm2ddl:
+          auto: update
+
+api:
+  baseurl: https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/all-vehicles-model/records?limit=100
