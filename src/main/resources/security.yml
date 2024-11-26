@@ -1,0 +1,32 @@
+spring:
+  application:
+    security: true
+  security:
+    oauth2:
+      client:
+        registration:
+          github:
+#            client-id:  #add before start
+#            client-secret:
+            scope: user:email
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            client-name: GitHub
+          google:
+#            client-id:
+#            client-secret:
+            redirect-uri: "{baseUrl}/login/oauth2/code/google"
+            scope:
+              - profile
+              - email
+              - openid
+            client-name: Google
+        provider:
+          github:
+            authorization-uri: https://github.com/login/oauth/authorize
+            token-uri: https://github.com/login/oauth/access_token
+            user-info-uri: https://api.github.com/user
+            user-name-attribute: id
+          google:
+            issuer-uri: https://accounts.google.com
+            user-info-uri: https://www.googleapis.com/userinfo/v2/me
+            token-validation-uri: https://oauth2.googleapis.com/tokeninfo?access_token=

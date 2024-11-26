@@ -2,6 +2,8 @@ server:
   port: 8888 #dont change
 
 spring:
+  config:
+    import: security.yml
   application:
      name: TrimbleCars
   h2:
