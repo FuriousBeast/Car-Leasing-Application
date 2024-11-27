@@ -5,14 +5,17 @@ import com.trimble.trimblecars.dto.ResponseType;
 import com.trimble.trimblecars.exception.ActionNotAllowedException;
 import com.trimble.trimblecars.exception.FieldMissingException;
 import com.trimble.trimblecars.exception.NotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException;
 
 /**
  * ErrorHandlerController.java
@@ -28,44 +31,61 @@ public class ErrorHandlerController
 {
     private static final Logger logger = LogManager.getLogger();
 
+    @Autowired
+    private HttpServletRequest httpServletRequest;
+
     @ExceptionHandler(value = {NotFoundException.class})
     public ResponseEntity<ApiResponse<String>> handleUserNotFound(NotFoundException exception)
     {
-        logger.error(exception.getMessage());
-        ApiResponse<String> apiResponse = ApiResponse.<String>builder().responseType(ResponseType.ERROR).responseMessage(exception.getMessage()).build();
-        return new ResponseEntity<>(apiResponse, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(formApiResponseAndLogException(exception), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(value = {ActionNotAllowedException.class})
     public ResponseEntity<ApiResponse<String>> handleActionNotAllowed(ActionNotAllowedException exception)
     {
-        logger.error(exception.getMessage());
-        ApiResponse<String> apiResponse = ApiResponse.<String>builder().responseType(ResponseType.ERROR).responseMessage(exception.getMessage()).build();
-        return new ResponseEntity<>(apiResponse, HttpStatus.FORBIDDEN);
+        return new ResponseEntity<>(formApiResponseAndLogException(exception), HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(value = {FieldMissingException.class})
     public ResponseEntity<ApiResponse<String>> handleFieldMissing(FieldMissingException exception)
     {
-        logger.error(exception.getMessage());
-        ApiResponse<String> apiResponse = ApiResponse.<String>builder().responseType(ResponseType.ERROR).responseMessage(exception.getMessage()).build();
-        return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(formApiResponseAndLogException(exception), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(value = {AccessDeniedException.class})
     public ResponseEntity<ApiResponse<String>> handleAccessDenied(AccessDeniedException exception)
     {
-        logger.error(exception.getMessage());
-        ApiResponse<String> apiResponse = ApiResponse.<String>builder().responseType(ResponseType.ERROR).responseMessage(exception.getMessage()).build();
-        return new ResponseEntity<>(apiResponse, HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(formApiResponseAndLogException(exception), HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(value = {HttpClientErrorException.Forbidden.class})
+    public ResponseEntity<ApiResponse<String>> handleForbidden(HttpClientErrorException.Forbidden exception)
+    {
+        return new ResponseEntity<>(formApiResponseAndLogException(exception), HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(value = {HttpClientErrorException.NotFound.class})
+    public ResponseEntity<ApiResponse<String>> handleNotFound(HttpClientErrorException.NotFound exception)
+    {
+        return new ResponseEntity<>(formApiResponseAndLogException(exception), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(value = {RuntimeException.class})
     public ResponseEntity<ApiResponse<String>> handleRunTime(RuntimeException exception)
     {
-        logger.error("{} {}",exception.getClass() ,exception.getMessage());
-        ApiResponse<String> apiResponse = ApiResponse.<String>builder().responseType(ResponseType.ERROR).responseMessage(exception.getMessage()).build();
-        return new ResponseEntity<>(apiResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(formApiResponseAndLogException(exception), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    private ApiResponse<String> formApiResponseAndLogException(Exception exception)
+    {
+        logger.error("Exception occurred at endpoint [{}] with method [{}], query parameters [{}], and message: [{}]. Root Cause: {}",
+                httpServletRequest.getRequestURI(),
+                httpServletRequest.getMethod(),
+                httpServletRequest.getQueryString() != null ? httpServletRequest.getQueryString() : "N/A",
+                exception.getMessage(),
+                exception.getCause() != null ? exception.getCause().toString() : "N/A");
+
+        return ApiResponse.<String>builder().responseType(ResponseType.ERROR).responseMessage(exception.getMessage()).build();
     }
 
 }
