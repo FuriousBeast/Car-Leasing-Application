@@ -58,14 +58,14 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter
 
                     if(userDetails.getRole().equals(Role.ROLE_PENDING)  && !request.getServletPath().contains("/auth/updateRole"))
                     {
-                        sendJsonErrorResponse(response, "Your account role is currently pending. To proceed, please update your role by sending a PUT request to /user/update with the desired role (e.g., 'car_owner', 'customer', etc.).");
+                        sendJsonErrorResponse(response, 403,"Your account role is currently pending. To proceed, please update your role by sending a PUT request to /user/update with the desired role (e.g., 'car_owner', 'customer', etc.).");
                         return;
                     }
                 }
                 else
                 {
                     //returns response that user found in token is not registered
-                    sendJsonErrorResponse(response, "User not found in records!");
+                    sendJsonErrorResponse(response, 403, "User not found in records!");
                     return;
                 }
 
@@ -73,7 +73,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter
             else
             {
                 //Authorization header is missing
-                sendJsonErrorResponse(response, "Authorization required!");
+                sendJsonErrorResponse(response, 401, "Authorization required!");
                 return;
             }
 
@@ -85,21 +85,24 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter
             logger.error(exception);
 
             //token not valid
-            sendJsonErrorResponse(response, "Invalid token");
+            sendJsonErrorResponse(response, 401,"Invalid token");
         }
     }
 
-    private void sendJsonErrorResponse(HttpServletResponse response, String message) throws IOException
+    private void sendJsonErrorResponse(HttpServletResponse response, int statusCode, String message) throws IOException
     {
         if(!response.isCommitted())
             response.reset();
 
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setStatus(statusCode);
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
-        // Construct the JSON error response
+            // Construct the JSON error response
         ApiResponse<String> apiResponse = ApiResponse.<String>builder().responseType(ResponseType.ERROR).responseMessage(message).build();
+
+        if(statusCode == 401)
+            apiResponse.setReturnResponse("Add valid Bearer Token in Authorization Header");
 
         response.getWriter().write(Objects.requireNonNull(CommonUtils.convertToJson(apiResponse)));
     }
