@@ -1,13 +1,11 @@
-package com.trimble.trimblecars.dto;
+package com.trimble.trimblecars.api_integration.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 /**
- * CarWrapper.java
+ * CarDTO.java
  *
  * @author Nandhakumar N 
  * @module com.trimble.trimblecars.entity
@@ -17,9 +15,9 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class CarWrapper
+public class CarDTO
 {
-    private int total_count;
-
-    private List<CarDTO> results;
+    private String make;
+    private String model;
+    private String year;
 }
