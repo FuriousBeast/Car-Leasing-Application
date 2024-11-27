@@ -3,8 +3,10 @@ package com.trimble.trimblecars.controller;
 import com.trimble.trimblecars.entity.Lease;
 import com.trimble.trimblecars.entity.Role;
 import com.trimble.trimblecars.entity.User;
+import com.trimble.trimblecars.exception.FieldMissingException;
 import com.trimble.trimblecars.service.AuthService;
 import com.trimble.trimblecars.service.LeaseService;
+import com.trimble.trimblecars.service.UserService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,23 +43,47 @@ public class LeaseController
     @Autowired
     private AuthService authService;
 
+    @Autowired
+    private UserService userService;
+
     /**
      * Starts a new lease for a given car and user.
      *
      * @param carId  the ID of the car to lease
+     * @param userId the ID of the user to start lease by admin
      * @return a response entity containing the created lease
      */
     @PostMapping("/startLease")
     @PreAuthorize("hasAnyRole('ADMIN','END_CUSTOMER')")
-    public ResponseEntity<Lease> startLease(@RequestParam Long carId)
+    public ResponseEntity<Lease> startLease(@RequestParam Long carId,
+                                            @RequestParam(required = false) Long userId)
     {
         User user = authService.fetchUserFromAuth();
 
-        logger.info("Received request to start lease for carId: {} by user : {}", carId, user.getEmail());
+        Lease lease;
 
-        Lease lease = leaseService.startLease(carId, user);
+        if(user.getRole() == Role.ADMIN)
+        {
+            if(userId == null)
+                throw new FieldMissingException("Field 'ownerId' required when process initiated by ADMIN");
 
-        logger.info("Lease started successfully with ID: {}", lease.getId());
+            User customer = userService.getUserById(userId);
+
+            logger.info("Received request to start lease by admin for carId: {} and customer : {}", carId, customer.getEmail());
+
+            lease = leaseService.startLease(carId, customer);
+
+            logger.info("Lease started successfully by admin with ID: {}", lease.getId());
+        }
+
+        else
+        {
+            logger.info("Received request to start lease for carId: {} by user : {}", carId, user.getEmail());
+
+            lease = leaseService.startLease(carId, user);
+
+            logger.info("Lease started successfully with ID: {}", lease.getId());
+        }
 
         return ResponseEntity.ok(lease);
     }
@@ -70,15 +96,35 @@ public class LeaseController
      */
     @PreAuthorize("hasAnyRole('ADMIN','END_CUSTOMER')")
     @PostMapping("/endLease")
-    public ResponseEntity<Lease> endLease(@RequestParam Long leaseId)
+    public ResponseEntity<Lease> endLease(@RequestParam Long leaseId,
+                                          @RequestParam(required = false) Long userId)
     {
         User user = authService.fetchUserFromAuth();
 
-        logger.info("Received request to end lease with ID: {} by userId: {}", leaseId, user.getEmail());
+        Lease lease;
 
-        Lease lease = leaseService.endLease(leaseId, user);
+        if(user.getRole() == Role.ADMIN)
+        {
+            if(userId == null)
+                throw new FieldMissingException("Field 'userId' required when process initiated by ADMIN");
 
-        logger.info("Lease with ID: {} ended successfully", lease.getId());
+            User customer = userService.getUserById(userId);
+
+            logger.info("Received request to end lease by admin with ID: {} for user: {}", leaseId, customer.getEmail());
+
+            lease = leaseService.endLease(leaseId, customer);
+
+            logger.info("Lease with ID: {} ended successfully by admin", lease.getId());
+        }
+
+        else
+        {
+            logger.info("Received request to end lease with ID: {} by userId: {}", leaseId, user.getEmail());
+
+            lease = leaseService.endLease(leaseId, user);
+
+            logger.info("Lease with ID: {} ended successfully", lease.getId());
+        }
 
         return ResponseEntity.ok(lease);
     }

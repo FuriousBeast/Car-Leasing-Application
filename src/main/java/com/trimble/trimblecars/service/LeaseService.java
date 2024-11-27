@@ -97,7 +97,7 @@ public class LeaseService
     {
         String email = user.getEmail();
 
-        logger.info("Ending lease with ID: {} by {}", leaseId, email);
+        logger.info("Ending lease with ID: {} for {}", leaseId, email);
 
         Lease lease = getLeaseById(leaseId);
 
@@ -121,7 +121,7 @@ public class LeaseService
 
         carService.saveCar(car);
 
-        logger.info("Lease with ID: {} ended successfully by userId: {}", leaseId, email);
+        logger.info("Lease with ID: {} ended successfully for userId: {}", leaseId, email);
 
         return leaseRepository.save(lease);
     }

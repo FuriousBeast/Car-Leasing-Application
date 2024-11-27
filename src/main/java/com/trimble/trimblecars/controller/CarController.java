@@ -1,9 +1,12 @@
 package com.trimble.trimblecars.controller;
 
 import com.trimble.trimblecars.entity.Car;
+import com.trimble.trimblecars.entity.Role;
 import com.trimble.trimblecars.entity.User;
+import com.trimble.trimblecars.exception.FieldMissingException;
 import com.trimble.trimblecars.service.CarService;
 import com.trimble.trimblecars.service.AuthService;
+import com.trimble.trimblecars.service.UserService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,23 +37,46 @@ public class CarController
 
     private static final Logger logger = LogManager.getLogger();
 
+    @Autowired
+    private UserService userService;
+
     /**
      * Registers a new car for the authenticated user(CAR_OWNER).
      *
-     * @param car Car details
+     * @param car     Car details
+     * @param ownerId the id of the owner to be registered by admin
      * @return Registered car details
      */
     @PreAuthorize("hasAnyRole('ADMIN', 'CAR_OWNER')")
     @PostMapping("/register")
-    public ResponseEntity<Car> registerCar(@RequestBody Car car)
+    public ResponseEntity<Car> registerCar(@RequestBody Car car,
+                                           @RequestParam(required = false) Long ownerId)
     {
         User user = authService.fetchUserFromAuth();
 
-        logger.info("Registering car for user {} : {}", user.getEmail(), car);
+        Car registeredCar;
 
-        Car registeredCar = carService.registerCar(car, user);
+        if(user.getRole().equals(Role.ADMIN))
+        {
+            if(ownerId == null)
+                throw new FieldMissingException("Field 'ownerId' required when process initiated by ADMIN");
 
-        logger.info("Car registered successfully for user {}", user.getEmail());
+            User owner = userService.getUserById(ownerId);
+
+            logger.info("Registering car by admin for user  {} : {}", owner.getEmail(), car);
+
+            registeredCar = carService.registerCar(car, owner);
+
+            logger.info("Car registered successfully by admin for user {}", owner.getEmail());
+        }
+        else
+        {
+            logger.info("Registering car for user {} : {}", user.getEmail(), car);
+
+            registeredCar = carService.registerCar(car, user);
+
+            logger.info("Car registered successfully for user {}", user.getEmail());
+        }
 
         return ResponseEntity.ok(registeredCar);
     }
@@ -90,7 +116,7 @@ public class CarController
 
         var fetchedCars = carService.getAllCars();
 
-        logger.info("Successfully fetched cars {}", fetchedCars.size());
+        logger.info("Successfully fetched cars by admin.. size = {}", fetchedCars.size());
 
         return ResponseEntity.ok(fetchedCars);
     }
@@ -110,7 +136,7 @@ public class CarController
 
         var allCarsByOwner = carService.getAllCarsByOwner(userFromAuth);
 
-        logger.info("Successfully fetched cars owned by the user.");
+        logger.info("Successfully fetched cars owned by the user.. size = {}",allCarsByOwner.size());
 
         return ResponseEntity.ok(allCarsByOwner);
     }
@@ -127,7 +153,7 @@ public class CarController
 
         var availableCars = carService.getAvailableCars();
 
-        logger.info("Successfully fetched available cars.");
+        logger.info("Successfully fetched available cars.. size = {}", availableCars.size());
 
         return ResponseEntity.ok(availableCars);
     }
@@ -142,9 +168,9 @@ public class CarController
     {
         logger.info("Fetching leased cars.");
 
-        logger.info("Successfully fetched leased cars.");
-
         var leasedCars = carService.getLeasedCars();
+
+        logger.info("Successfully fetched leased cars.. size = {}", leasedCars.size());
 
         return ResponseEntity.ok(leasedCars);
     }
