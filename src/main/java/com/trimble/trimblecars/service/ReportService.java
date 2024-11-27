@@ -5,6 +5,7 @@ import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
+import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
 import com.trimble.trimblecars.entity.Car;
 import com.trimble.trimblecars.entity.Lease;
@@ -31,39 +32,30 @@ public class ReportService
 
         try (PdfWriter writer = new PdfWriter(outputStream);
              PdfDocument pdfDocument = new PdfDocument(writer);
-                 Document document = new Document(pdfDocument))
-        {
+             Document document = new Document(pdfDocument)) {
 
             Paragraph title = new Paragraph("Trimble Cars")
                     .setBold()
                     .setFontSize(20)
-                    .setTextAlignment(com.itextpdf.layout.properties.TextAlignment.CENTER)
-                    .setMarginBottom(20); // Add spacing after the title
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setMarginBottom(20);
             document.add(title);
             document.add(new Paragraph("Lease History Report").setBold().setFontSize(16));
             document.add(new Paragraph("Generated on: " + java.time.LocalDate.now()).setFontSize(10));
             document.add(new Paragraph("\n"));
 
-            // Handle Empty Lease List
-            if(CommonUtils.nullOrEmpty(leases))
-            {
+            if (CommonUtils.nullOrEmpty(leases)) {
                 Paragraph noData = new Paragraph("No lease history data available.")
                         .setFontSize(14)
-                        .setTextAlignment(com.itextpdf.layout.properties.TextAlignment.CENTER)
-                        .setMarginTop(50); // Add spacing from the title
+                        .setTextAlignment(TextAlignment.CENTER)
+                        .setMarginTop(50);
                 document.add(noData);
-            }
-            else
-            {
-                // Create Table with Column Widths
-                Table table = new Table(new float[]{2, 4, 4, 3, 3, 4, 4, 3});
-
-                table.setMaxWidth(UnitValue.createPercentValue(100));
+            } else {
+                Table table = new Table(new float[]{1, 2, 2, 2, 2, 2, 1}).useAllAvailableWidth();
                 table.addHeaderCell("Lease ID");
                 table.addHeaderCell("Car Model");
                 table.addHeaderCell("Car Owner");
                 table.addHeaderCell("Customer");
-                table.addHeaderCell("Customer Id");
                 table.addHeaderCell("Start Date");
                 table.addHeaderCell("End Date");
                 table.addHeaderCell("Status");
@@ -71,10 +63,10 @@ public class ReportService
                 for (Lease lease : leases) {
                     table.addCell(String.valueOf(lease.getId()));
                     Car car = lease.getCar();
-                    table.addCell(car.getMake() + " " + car.getModel() + " " + car.getYear());
-                    table.addCell(car.getOwner().getUsername());
-                    table.addCell(lease.getCustomer().getUsername());
-                    table.addCell(lease.getCustomer().getUserId().toString());
+                    String carDetails = (car.getMake() + " " + car.getModel() + " " + car.getYear());
+                    table.addCell(carDetails.length() > 30 ? carDetails.substring(0, 30) + "..." : carDetails);
+                    table.addCell(car.getOwner().getName());
+                    table.addCell(lease.getCustomer().getName());
                     table.addCell(lease.getStartDate().toString());
                     table.addCell(lease.getEndDate() != null ? lease.getEndDate().toString() : "NA");
                     table.addCell(lease.getState().name());
