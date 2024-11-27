@@ -12,8 +12,6 @@ import org.springframework.security.config.annotation.web.configurers.CsrfConfig
 import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @EnableWebSecurity
@@ -59,16 +57,6 @@ public class SecurityConfig
                                 .oidcUserService(customOidcUserService)) //handles oidc(google) login
                         .defaultSuccessUrl("/auth/login", true)) // Redirect here after login
                 .build();
-    }
-
-    @Bean
-    public WebMvcConfigurer webMvcConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void configurePathMatch(PathMatchConfigurer configurer) {
-                configurer.setUseTrailingSlashMatch(false);
-            }
-        };
     }
 
 }
