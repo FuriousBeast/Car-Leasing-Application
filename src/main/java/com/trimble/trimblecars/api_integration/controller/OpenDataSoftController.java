@@ -1,5 +1,6 @@
 package com.trimble.trimblecars.api_integration.controller;
 
+import com.trimble.trimblecars.api_integration.dto.CarDTO;
 import com.trimble.trimblecars.api_integration.service.OpenDataSoftApiService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -54,12 +56,12 @@ public class OpenDataSoftController
      * @return Set of car models
      */
     @GetMapping("/getModel")
-    public ResponseEntity<Set<String>> getListOfBrands(@RequestParam String make)
+    public ResponseEntity<List<CarDTO>> getListOfBrands(@RequestParam String make)
     {
         logger.info("Fetching list of car models for brand: {}", make);
 
         var listOfBrands = openDataSoftApiService.getListOfModels(make);
-        
+
         logger.info("Successfully fetched car models for brand: {}", make);
 
         return ResponseEntity.ok(listOfBrands);

@@ -65,7 +65,7 @@ public class OpenDataSoftApiService
         }
     }
 
-    public Set<String> getListOfModels(String make)
+    public List<CarDTO> getListOfModels(String make)
     {
         try {
 
@@ -79,16 +79,13 @@ public class OpenDataSoftApiService
                 CarWrapper carWrapper = entity.getBody();
 
                 if(carWrapper == null) {
-                    return Collections.emptySet();
+                    return Collections.emptyList();
                 }
 
-                return carWrapper.getResults()
-                        .stream()
-                        .map(CarDTO::getModel)
-                        .collect(Collectors.toCollection(TreeSet::new));
+                return carWrapper.getResults();
             }
             else
-                return Collections.emptySet();
+                return Collections.emptyList();
         }
         catch (Exception e)
         {
