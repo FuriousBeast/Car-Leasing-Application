@@ -31,7 +31,7 @@
 1. **Admin**:
    - Full access to manage users, cars, and leases.
    - Ability to register cars on behalf of owners.
-   - Ability to start lease on behalf of customer.
+   - Ability to start and end lease on behalf of customer.
    - Can fetch or export all lease history.
 
 2. **Owner**:
