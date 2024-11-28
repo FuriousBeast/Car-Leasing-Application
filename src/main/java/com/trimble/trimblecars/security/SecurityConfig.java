@@ -28,7 +28,7 @@ public class SecurityConfig
     private TokenService tokenService;
 
     @Bean
-    @ConditionalOnProperty(value = "spring.application.security", havingValue = "false")
+    @ConditionalOnProperty(value = "spring.application.security", havingValue = "false") //disable security
     public DefaultSecurityFilterChain defaultSecurityFilterChain(HttpSecurity httpSecurity) throws Exception
     {
         return httpSecurity
@@ -40,7 +40,7 @@ public class SecurityConfig
     }
 
     @Bean
-    @ConditionalOnProperty(value = "spring.application.security", havingValue = "true")
+    @ConditionalOnProperty(value = "spring.application.security", havingValue = "true")  //enable security
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception
     {
         return http
