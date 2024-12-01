@@ -58,7 +58,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter
 
                     if(userDetails.getRole().equals(Role.ROLE_PENDING)  && !request.getServletPath().contains("/auth/updateRole"))
                     {
-                        sendJsonErrorResponse(response, 403,"Your account role is currently pending. To proceed, please update your role by sending a PUT request to /auth/update with the desired role (e.g., 'car_owner', 'customer', etc.).");
+                        sendJsonErrorResponse(response, 403,"Your account role is currently pending. To proceed, please update your role by sending a PUT request to /auth/updateRole with the desired role (e.g., 'car_owner', 'customer', etc.).");
                         return;
                     }
                 }
