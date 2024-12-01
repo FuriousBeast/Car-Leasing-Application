@@ -123,7 +123,7 @@ public class UserService
             }
 
             if(userByEmail.getRole() != Role.ROLE_PENDING) {
-                throw new ActionNotAllowedException("User with email id "+email + " is already a "+userByEmail.getRole() + "Role change is not applicable");
+                throw new ActionNotAllowedException("User with email id "+email + " is already a "+userByEmail.getRole() + " Role change is not applicable");
             }
 
             Role userRole = Role.valueOf(role);
@@ -132,7 +132,7 @@ public class UserService
 
             return userRepository.save(userByEmail);
         }
-        catch (Exception e)
+        catch (IllegalArgumentException e)
         {
             throw new FieldMissingException("Field role can be (ADMIN/CAR_OWNER/CUSTOMER)");
         }
