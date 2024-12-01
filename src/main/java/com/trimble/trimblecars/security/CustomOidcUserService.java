@@ -34,17 +34,14 @@ public class CustomOidcUserService extends OidcUserService
     @Override
     public OidcUser loadUser(OidcUserRequest userRequest) throws OAuth2AuthenticationException
     {
-        logger.info("Inside Oidc load");
         OidcUser oidcUser = super.loadUser(userRequest);
 
         Map<String, Object> attributes = oidcUser.getAttributes();
-        logger.info("Google OIDC Attributes: {}", attributes);
 
         // Example: Extract specific details
         String email = (String) attributes.get("email");
         String name = (String) attributes.get("name");
 
-        logger.info("Google user email: {}", email);
         User user = userService.getUserByEmail(email);
 
         if (user == null) {
