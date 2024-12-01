@@ -75,7 +75,7 @@
 | HTTP Method | Endpoint                       | Roles               | Description                                      |
 |-------------|--------------------------------|---------------------|--------------------------------------------------|
 | GET         | `/user/getAllUsers`            | Admin               | Fetch all registered users.                      |
-| PUT         | `/auth/update`                 | User,Customer       | Update your role to customer or user             |
+| PUT         | `/auth/updateRole`             | All Users           | Update your role to customer or user             |
 ---
 
 ## Technologies Used
