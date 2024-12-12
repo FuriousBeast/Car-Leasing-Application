@@ -5,7 +5,7 @@ spring:
   config:
     import: security.yml
   application:
-     name: TrimbleCars
+     name: CarLeasingApplication
   h2:
      console:
        enabled: true
@@ -13,7 +13,7 @@ spring:
     driver-class-name: org.hsqldb.jdbc.JDBCDriver
     username: user
     password: 12qwaszx
-    url: jdbc:hsqldb:file:TrimbleCarsDB;shutdown=true
+    url: jdbc:hsqldb:file:CarsDB;shutdown=true
   jpa:
     properties:
       hibernate:
