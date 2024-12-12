@@ -1,6 +1,6 @@
-# TrimbleCars Application
+# Car Leasing Application
 
-**TrimbleCars** is a car leasing application designed to cater to three types of users: **Admin**, **Customer**, and **Owner**. This application provides robust features for car management, leasing, and tracking lease history.  
+**NkCars** is a car leasing application designed to cater to three types of users: **Admin**, **Customer**, and **Owner**. This application provides robust features for car management, leasing, and tracking lease history.  
 
 ## Features
 - **Car Management**:
@@ -97,8 +97,8 @@
 ### Steps
 1. Clone the repository:
    ```bash
-   git clone https://github.com/trimblecars/TrimbleCars.git
-   cd TrimbleCars
+   git clone https://github.com/FuriousBeast/Car-Leasing-Application.git
+   cd Car-Leasing-Application
 2. Uncomment and Configure google and github client id and secret in 
    ```bash
    src/main/resources/security.yml
@@ -110,7 +110,7 @@
 4. Run the extracted Jar.
    ```bash
    cd build/libs
-   java -jar TrimbleCars-0.0.1-SNAPSHOT.jar 
+   java -jar Car-Leasing-Application-0.0.1-SNAPSHOT.jar 
 
 5. Access the application
    ```bash
