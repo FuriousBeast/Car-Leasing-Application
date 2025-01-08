@@ -14,7 +14,7 @@ import java.util.Date;
 @Component
 public class AuthService {
 
-    private static final String SECRET_KEY = "trimble";
+    private static final String SECRET_KEY = "nkcars";
 
     public String generateToken(User user) {
         return JWT.create()
